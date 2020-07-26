@@ -1,0 +1,147 @@
+<html>
+
+<head>
+  <title>Methodist Circuits!</title>
+  <link rel="stylesheet" href="assets/leaflet.css" />
+  <script src="assets/leaflet.js"></script>
+  <script src="assets/jquery.min.js"></script>
+  <script src="assets/methodist.js"></script>
+
+  <style>
+    #map {
+      height: 100%
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="map"></div>
+
+  <script>
+ var zim;
+    // initialize the map
+    var map = L.map('map').setView([-17.82772, 31.05337], 10);
+
+    var basemap = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+                // crs: 3875,
+                maxZoom: 20,
+                subdomains:['mt0','mt1','mt2','mt3']
+            }).addTo(map);
+
+    // load a tile layer
+  var openstreet =  L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+      {
+        attribution: ' OpenStreetMap',
+        maxZoom: 17,
+        minZoom: 8
+      }).addTo(map);
+
+	function getColor(d) {
+	    return d == "BINDURA" ? '#00BFFF' :
+	           d == "BORRODALE CIRCIT" ? '#BD0026' :
+	           d == "CHITUNGWIZA EAST" ? '#E31A1C' :
+              d == "CHITUNGWIZA EAST RURAL" ? '#E31A1C' :
+	           d == "CHITUNGWIZA WEST" ? '#FC4E2A' :
+	           d == "EPWOTH"  ? '#FD8D3C' :
+	           d == "GOROMONZI"  ? '#FEB24C' :
+             d == "GREENDALE"  ? '#8B0000' :
+             d == "GREENDALE RURAL"  ? '#8B0000' :
+             d == "HARAHWA"  ? '#FFD700' :
+             d == "MABUKU TAFARA"  ? '#FFFF00' :
+             d == "MOUNT PLEASENT"  ? '#BDB76B' :
+             d == "MT DAWRWIN"  ? '#00FF00' :
+             d == "MUREHWA"  ? '#FED976' :
+             d == "MUTOKO"  ? '#2E8B57' :
+              d == "MUZARABANI"  ? '#6B8E23' :
+            d == "MVURWI"  ? '#00CED1' :
+            d == "SHAMVA"  ? '#00008B' :
+            d == "TRINITY F"  ? '#FF00FF' :
+             d == "trinity rural"  ? '#FF00FF' :
+              d == "ZENGEZA CIRCUIT"  ? '#FF1493' :
+              d == "RUSHINGA/MOUNT DARWIN"  ? '#808080' :
+              d == "UZUMBA SECTION"  ? '#D2691E' :
+	           d = 10   ? '#FED976' :
+	                      '#FFEDA0';
+  }
+  
+//   var zoneLayer = L.geoJson(false, {
+//     style: mystyle3,
+//     onEachFeature: function (feature, layer) {
+//         layer.bindPopup('Zone Name: ' + feature.properties.f2);
+// var layerGroup = L.geoJSON(data, {
+//   onEachFeature: function (feature, layer) {
+//     layer.bindPopup('<h1>'+feature.properties.f1+'</h1><p>name: '+feature.properties.f2+'</p>');
+//   }
+// }).addTo(map);
+
+//     }
+// });
+
+function style(feature) {
+    return {
+        fillColor: getColor(feature.properties.NAME),
+        weight: 2,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+        fillOpacity: 0.4
+    };
+}
+ 
+function highlightFeature(e) {
+    var layer = e.target;
+
+    layer.setStyle({
+        weight: 5,
+        color: '#666',
+        dashArray: '',
+        fillOpacity: 0.4
+    });
+
+    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        layer.bringToFront();
+    }
+}
+
+function resetHighlight(e) {
+    zim.resetStyle(e.target);
+}
+
+function zoomToFeature(e) {
+    map.fitBounds(e.target.getBounds());
+}
+
+function onEachFeature(feature, layer) {
+    layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight,
+        click: zoomToFeature
+    });
+
+    layer.bindPopup('<h2> Circuit Name: '+feature.properties.NAME+'</h2>');
+}
+
+
+var baseMaps = {'Google Hybrid': basemap,
+                'Open Streetmap' : openstreet
+};
+
+var overlays = {
+    // "All Properties": cadaLayer,
+    // "Zone": zoneLayer
+
+            };
+
+L.control.layers(baseMaps, overlays,null,{collapsed:false}).addTo(map);
+
+   zim = L.geoJson(methodist, {
+      style: style,
+      onEachFeature: onEachFeature
+    }).addTo(map);
+
+
+  </script>
+</body>
+
+</html>
